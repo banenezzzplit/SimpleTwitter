@@ -39,7 +39,8 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
 ## Notes
 
-Describe any challenges encountered while building the app.
+- Android studio would not read JAVA files.
+- Bug in code caused by missing equal sign was also challenging to find.
 
 ## Open-source libraries used
 
