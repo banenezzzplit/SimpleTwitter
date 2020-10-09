@@ -1,6 +1,9 @@
 package com.codepath.apps.restclienttemplate;
 
 import android.content.Context;
+import android.icu.text.SimpleDateFormat;
+import android.os.Build;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,12 +11,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 
+import java.text.ParseException;
 import java.util.List;
+import java.util.Locale;
+
 
 public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.Viewholder>{
     Context context;
@@ -34,6 +41,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.Viewholder
     }
 
     // Bind values based on the position of the element
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onBindViewHolder(@NonNull Viewholder holder, int position) {
         // Get the data
@@ -64,17 +72,33 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.Viewholder
         ImageView ivProfileImage;
         TextView tvBody;
         TextView tvScreenName;
+        TextView tvTime;
         public Viewholder(@NonNull View itemView) {
             super(itemView);
             ivProfileImage = itemView.findViewById(R.id.ivProfileImage);
             tvBody = itemView.findViewById(R.id.tvBody);
             tvScreenName = itemView.findViewById(R.id.tvScreenName);
+            tvTime = itemView.findViewById(R.id.tvTime);
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.N)
         public void bind(Tweet tweet) {
             tvBody.setText(tweet.body);
             tvScreenName.setText(tweet.user.screenName);
             Glide.with(context).load(tweet.user.profileImageUrl).into(ivProfileImage);
+            String twitterFormat = "EEE MMM dd HH:mm:ss ZZZZZ yyyy";
+            SimpleDateFormat sf = new SimpleDateFormat(twitterFormat, Locale.ENGLISH);
+            sf.setLenient(true);
+
+            String relativeDate = "";
+            try {
+                long dateMillis = sf.parse(tweet.createdAt).getTime();
+                relativeDate = DateUtils.getRelativeTimeSpanString(dateMillis,
+                        System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE).toString();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            tvTime.setText(relativeDate);
         }
     }
 }
